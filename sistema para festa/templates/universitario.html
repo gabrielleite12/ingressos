@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastro Universitário - JB012</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    form {
+      background: #222;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: auto;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    .upload-wrapper {
+      margin: 15px 0;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      background-color: #333;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .upload-btn:hover {
+      background-color: #444;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    #preview {
+      margin-top: 10px;
+      max-width: 100%;
+      border-radius: 8px;
+      display: none;
+    }
+
+    button {
+      background: #00cc88;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    #logo {
+      width: 350px;
+      margin-bottom: 20px;
+    }
+
+    .sucesso {
+      color: #00cc88;
+      font-size: 18px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo -->
+  <img id="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo do Baile JB012">
+
+  <!-- Formulário de universitário -->
+  <form id="formUniversitario" method="POST" enctype="multipart/form-data" action="/universitario">
+    <input type="text" name="nome" placeholder="Nome completo" required>
+    <input type="text" name="cpf" placeholder="CPF" required>
+    <input type="text" name="ra" placeholder="RA (Registro Acadêmico)" required>
+    <input type="email" name="email" placeholder="Seu E-mail" required>
+
+    <div class="upload-wrapper">
+      <label for="foto_ra" class="upload-btn">Selecionar foto do RA</label>
+      <input type="file" name="foto_ra" id="foto_ra" accept="image/*" required>
+      <img id="preview" src="#" alt="Pré-visualização" />
+    </div>
+
+    <button type="submit">Enviar</button>
+  </form>
+
+  {% if mensagem_sucesso %}
+    <p class="sucesso">{{ mensagem_sucesso }}</p>
+    <script>
+      // Após 10 segundos, redireciona para a página inicial
+      setTimeout(function() {
+        window.location.href = "/";
+      }, 10000); // 10000ms = 10 segundos
+    </script>
+  {% endif %}
+
+  <script>
+    const fileInput = document.getElementById("foto_ra");
+    const preview = document.getElementById("preview");
+
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+
+</body>
+</html>
