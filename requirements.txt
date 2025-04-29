@@ -1,4 +1,4 @@
-Flask
-qrcode
-reportlab
-Werkzeug
+Flask==2.2.5
+qrcode==7.4.2
+reportlab==4.0.4
+Werkzeug==2.2.5
