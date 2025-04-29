@@ -1,7 +1,4 @@
 Flask
 qrcode
 reportlab
-sqlite3  # OBS: apenas para referência, pois já vem com Python
-smtplib  # OBS: já incluído no Python, não precisa instalar
-email    # OBS: já incluído no Python, não precisa instalar
 Werkzeug
