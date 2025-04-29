@@ -1,2 +1,5 @@
 Flask
+qrcode
+reportlab
+werkzeug
 gunicorn
