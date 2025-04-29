@@ -484,5 +484,4 @@ def atualizarstatuspromoter():
         print("Erro ao atualizar status:", e)
         return jsonify({"sucesso": False})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
