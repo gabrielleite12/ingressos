@@ -1,5 +1,5 @@
-import uuid
 from flask import Flask, request, jsonify, send_file, render_template, redirect
+import uuid
 import qrcode
 from reportlab.pdfgen import canvas
 import sqlite3
