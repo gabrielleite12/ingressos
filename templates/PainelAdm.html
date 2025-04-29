@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel Administrativo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background-color: #000;
+      color: #ffd700;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background-color: #111;
+      width: 250px;
+      transition: width 0.3s ease;
+      padding: 20px;
+      border-right: 2px solid #ffd700;
+    }
+
+    .sidebar.collapsed {
+      width: 70px;
+    }
+
+    .sidebar h1 {
+      font-size: 24px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar.collapsed h1,
+    .sidebar.collapsed .label {
+      display: none;
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      color: #ffd700;
+      font-size: 24px;
+      cursor: pointer;
+      margin-bottom: 30px;
+    }
+
+    .nav-item {
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      color: #ffd700;
+    }
+
+    .nav-item:hover {
+      text-decoration: underline;
+    }
+
+    .nav-item i {
+      margin-right: 10px;
+    }
+
+    .content {
+      flex: 1;
+      padding: 40px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .table th,
+    .table td {
+      padding: 12px;
+      border: 1px solid #ffd700;
+      text-align: left;
+    }
+
+    .table th {
+      background-color: #333;
+    }
+
+    .table tr:nth-child(even) {
+      background-color: #222;
+    }
+
+    .cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background-color: #111;
+      padding: 20px;
+      border: 1px solid #ffd700;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .card button {
+      background-color: #ffd700;
+      color: #111;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .card button:hover {
+      background-color: #e6c200;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button><br>
+    <img src="/static/logo.png" alt="Logo" style="width: 150%; max-width: 150px; margin-bottom: 10px;">
+    <div class="nav-item" onclick="mudarConteudo('dashboard')"><i>📊</i><span class="label">Dashboard</span></div>
+    <div class="nav-item" onclick="mudarConteudo('ingressos')"><i>🎟️</i><span class="label">Ingressos</span></div>
+    <div class="nav-item" onclick="mudarConteudo('clientes')"><i>👥</i><span class="label">Clientes</span></div>
+    <div class="nav-item" onclick="mudarConteudo('promoter')"><i>🧑‍💼</i><span class="label">Promoter</span></div>
+    <div class="nav-item" onclick="mudarConteudo('configuracoes')"><i>⚙️</i><span class="label">Configurações</span></div>
+  </div>
+
+  <div class="content" id="conteudo">
+    <h1>Bem-vindo ao Painel Administrativo</h1>
+    <p>Escolha uma opção no menu à esquerda para começar.</p>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("collapsed");
+    }
+
+    function mudarConteudo(pagina) {
+      const conteudo = document.getElementById("conteudo");
+
+      if (pagina === "dashboard") {
+        Promise.all([ 
+          fetch('/api/total_pessoas').then(res => res.json()),
+          fetch('/api/total_pagantes').then(res => res.json())
+        ])
+        .then(([dadosPessoas, dadosPagantes]) => {
+          conteudo.innerHTML = `
+            <h1>Dashboard</h1>
+            <div class="cards">
+              <div class="card">
+                <h2>Total de Pessoas</h2>
+                <p>Total de pessoas confirmadas: <strong>${dadosPessoas.total}</strong></p>
+                <button>Ver detalhes</button>
+              </div>
+              <div class="card">
+                <h2>Pessoas Pagantes</h2>
+                <p>Total de pagantes: <strong>${dadosPagantes.total_pagantes}</strong></p>
+                <button>Ver detalhes</button>
+              </div>
+              <div class="card">
+                <h2>Gráficos</h2>
+                <p>Acompanhe as estatísticas de venda.</p>
+                <button>Visualizar</button>
+              </div>
+            </div>
+          `;
+        })
+        .catch(err => {
+          conteudo.innerHTML = `<p>Erro ao carregar dados do dashboard.</p>`;
+          console.error(err);
+        });
+      }
+
+      else if (pagina === "ingressos") {
+        conteudo.innerHTML = `
+          <h1>Ingressos</h1>
+          <div class="cards">
+            <div class="card">
+              <h2>Lote 1</h2>
+              <p>Disponíveis: 120</p>
+              <button>Editar</button>
+            </div>
+            <div class="card">
+              <h2>Lote 2</h2>
+              <p>Disponíveis: 80</p>
+              <button>Editar</button>
+            </div>
+          </div>
+        `;
+      }
+
+      else if (pagina === "clientes") {
+        fetch('/api/clientes')
+          .then(res => res.json())
+          .then(dados => {
+            let tabela = `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1>Clientes</h1>
+                <button onclick="window.location.href='/ingressos'"  
+                        style="padding: 10px 20px; background-color: #ffd700; color: #000; border: none; border-radius: 5px; cursor: pointer;">
+                  Mais Informações
+                </button>
+              </div>
+
+              <table style="width: 100%; border-collapse: collapse; color: #ffd700;">
+                <thead>
+                  <tr>
+                    <th style="border: 1px solid #ffd700; padding: 10px;">Código</th>
+                    <th style="border: 1px solid #ffd700; padding: 10px;">Nome</th>
+                    <th style="border: 1px solid #ffd700; padding: 10px;">CPF</th>
+                    <th style="border: 1px solid #ffd700; padding: 10px;">Universitário</th>
+                    <th style="border: 1px solid #ffd700; padding: 10px;">Promoter</th>
+                    <th style="border: 1px solid #ffd700; padding: 10px;">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+            `;
+
+            dados.forEach(cliente => {
+              tabela += `
+                <tr>
+                  <td style="border: 1px solid #ffd700; padding: 10px;">${cliente.codigo}</td>
+                  <td style="border: 1px solid #ffd700; padding: 10px;">${cliente.nome}</td>
+                  <td style="border: 1px solid #ffd700; padding: 10px;">${cliente.cpf}</td>
+                  <td style="border: 1px solid #ffd700; padding: 10px;">${cliente.universitario}</td>
+                  <td style="border: 1px solid #ffd700; padding: 10px;">${cliente.promoter}</td>
+                  <td style="border: 1px solid #ffd700; padding: 10px;">${cliente.status}</td>
+                </tr>
+              `;
+            });
+
+            tabela += `
+                </tbody>
+              </table>
+            `;
+
+            conteudo.innerHTML = tabela;
+          })
+          .catch(err => {
+            conteudo.innerHTML = `<p>Erro ao carregar os dados dos clientes.</p>`;
+            console.error(err);
+          });
+      }
+
+      else if (pagina === "promoter") {
+    fetch('/api/promoters')
+      .then(res => res.json())
+      .then(dados => {
+        let tabela = `
+          <h1>Promoters</h1>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>E-mail</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        dados.forEach(item => {
+          tabela += `
+            <tr>
+              <td>${item.codigo}</td>
+              <td>${item.nome}</td>
+              <td>${item.cpf}</td>
+              <td>${item.email}</td>
+              <td id="status-${item.email}">${item.status}</td>
+              <td>
+                <button onclick="atualizarStatus('${item.email}', 'Aprovado')">Aprovar</button>
+                <button onclick="atualizarStatus('${item.email}', 'Reprovado')">Reprovar</button>
+              </td>
+            </tr>
+          `;
+        });
+
+        tabela += `
+            </tbody>
+          </table>
+        `;
+
+        conteudo.innerHTML = tabela;
+      })
+      .catch(err => {
+        conteudo.innerHTML = `<p>Erro ao carregar os promoters.</p>`;
+        console.error(err);
+      });
+}
+
+
+      else if (pagina === "configuracoes") {
+        conteudo.innerHTML = `
+          <h1>Configurações</h1>
+          <div class="cards">
+            <div class="card">
+              <h2>Alterar Logo</h2>
+              <p>Atualize a logo do painel.</p>
+              <button>Alterar Logo</button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function atualizarStatus(email, novoStatus) {
+    fetch('/api/atualizarstatus', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            email: email,
+            status: novoStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.sucesso) {
+            const statusElemento = document.getElementById(`status-${email}`);
+            if (statusElemento) statusElemento.textContent = novoStatus;
+
+            alert('Status atualizado com sucesso!');
+
+            if (data.txid && data.qr_code_url) {
+                const resultadoDiv = document.getElementById('resultado-pagamento');
+                resultadoDiv.innerHTML = `
+                    <div class="card">
+                        <p><strong>TXID:</strong> ${data.txid}</p>
+                        <img src="${data.qr_code_url}" alt="QR Code do Ingresso" style="width:200px;">
+                    </div>
+                `;
+            }
+        } else {
+            alert('Erro ao atualizar o status.');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao atualizar o status.');
+    });
+}
+
+function recarregarPromoters() {
+    fetch('/api/promoters')
+        .then(response => response.json())
+        .then(promoters => {
+            const tabela = document.getElementById('tabela-promoters');
+            tabela.innerHTML = '';
+
+            promoters.forEach(promoter => {
+                const row = tabela.insertRow();
+                row.innerHTML = `
+                    <td>${promoter.codigo}</td>
+                    <td>${promoter.nome}</td>
+                    <td>${promoter.cpf}</td>
+                    <td>${promoter.email}</td>
+                    <td id="status-${promoter.email}">${promoter.status}</td>
+                    <td>
+                        <button onclick="atualizarStatus('${promoter.email}', 'Aprovado')">Aprovar</button>
+                        <button onclick="atualizarStatus('${promoter.email}', 'Reprovado')">Reprovar</button>
+                    </td>
+                `;
+            });
+        });
+}
+
+
+function recarregarPromoters() {
+    fetch('/api/promoters')
+    .then(response => response.json())
+    .then(promoters => {
+        // Limpa a tabela existente
+        const tabela = document.getElementById('tabela-promoters');
+        tabela.innerHTML = '';
+
+        // Preenche a tabela com os dados atualizados
+        promoters.forEach(promoter => {
+            const row = tabela.insertRow();
+            row.innerHTML = `
+                <td>${promoter.codigo}</td>
+                <td>${promoter.nome}</td>
+                <td>${promoter.cpf}</td>
+                <td>${promoter.email}</td>
+                <td>${promoter.universitario}</td>
+                <td id="status-${promoter.codigo}">${promoter.status}</td>
+                <td><button onclick="atualizarStatus(${promoter.codigo}, 'Aprovado')">Aprovar</button></td>
+                <td><button onclick="atualizarStatus(${promoter.codigo}, 'Reprovado')">Reprovar</button></td>
+            `;
+        });
+    });
+}
+
+  </script>
+
+</body>
+</html>

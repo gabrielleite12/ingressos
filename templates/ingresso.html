@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ingresso - Baile JB012</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #logo {
+      width: 200px;
+      margin-bottom: 20px;
+    }
+
+    #ingressoQR {
+      margin-top: 20px;
+    }
+
+    #ingressoQR img {
+      width: 250px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo do Baile -->
+  <img id="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Logo do Baile JB012">
+
+  <!-- Mensagem de agradecimento -->
+  <h2>Obrigado pela sua compra!</h2>
+  <p>Seu ingresso para o Baile JB012 foi gerado com sucesso.</p>
+
+  <!-- QR Code do Ingresso -->
+  <div id="ingressoQR">
+    <h3>Seu ingresso:</h3>
+    <img src="{{ ingresso_qr_url }}" alt="QR Code do Ingresso" />
+  </div>
+
+</body>
+</html>

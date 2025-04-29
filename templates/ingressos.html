@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ingressos Comprados</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      margin: 20px 0;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #444;
+      text-align: center;
+    }
+
+    th {
+      background-color: #444;
+    }
+
+    tr:nth-child(even) {
+      background-color: #333;
+    }
+
+    a {
+      color: #00cc88;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    select {
+      background-color: #222;
+      color: white;
+      border: 1px solid #444;
+      padding: 5px;
+    }
+
+    .danger-button {
+      margin-top: 20px;
+      background-color: red;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .danger-button:hover {
+      background-color: darkred;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Ingressos Comprados</h1>
+
+  <!-- Formulário para atualizar o status -->
+  <form method="POST" action="/atualizar_status">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Universitário</th>
+          <th>Promoter</th>
+          <th>Status</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ingresso in ingressos %}
+          <tr>
+            <td>{{ ingresso[0] }}</td>
+            <td>{{ ingresso[1] }}</td>
+            <td>{{ ingresso[2] }}</td>
+            <td>{{ 'Sim' if ingresso[3] else 'Não' }}</td>
+            <td>{{ 'Sim' if ingresso[4] else 'Não' }}</td>
+            <td>
+              <select name="status_{{ ingresso[0] }}">
+                <option value="Pendente" {% if ingresso[5] == 'Pendente' %}selected{% endif %}>Pendente</option>
+                <option value="Aprovado" {% if ingresso[5] == 'Aprovado' %}selected{% endif %}>Aprovado</option>
+                <option value="Reprovado" {% if ingresso[5] == 'Reprovado' %}selected{% endif %}>Reprovado</option>
+              </select>              
+            </td>
+            <td>
+              <select onchange="if(this.value) window.location.href=this.value;">
+                <option value="">Escolher Ação</option>
+                <option value="/confirmar/{{ ingresso[0] }}">Visualizar QR Code</option>
+                <option value="/excluir/{{ ingresso[0] }}">Excluir</option>
+              </select>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <button type="submit">Salvar Alterações</button>
+  </form>
+
+  <!-- Formulário para apagar todos os ingressos -->
+  <form method="POST" action="/apagar_tudo" onsubmit="return confirm('Tem certeza que deseja apagar todos os ingressos?');">
+    <button type="submit" class="danger-button">Apagar Todos os Ingressos</button>
+  </form>
+
+  <p><a href="/">Voltar para a página inicial</a></p>
+
+</body>
+</html>

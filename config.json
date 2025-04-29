@@ -1,0 +1,7 @@
+{
+    "mercado_pago_token": "SEU_TOKEN_AQUI",
+    "pix_key": "SUA_CHAVE_PIX_AQUI",
+    "outro_config": "valor",
+    "sandbox": true
+  }
+  
