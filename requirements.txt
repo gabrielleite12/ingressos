@@ -1,4 +1,1 @@
 Flask
-qrcode
-reportlab
-Werkzeug
