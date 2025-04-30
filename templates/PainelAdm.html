@@ -310,7 +310,7 @@ else if (pagina === "confirmacao") {
       
       <!-- Logo centralizada no topo -->
       <img src="/static/logo.png" alt="Logo" 
-           style="width: 300px; max-width: 40vw; margin-bottom: 25px;">
+           style="width: 180px; max-width: 40vw; margin-bottom: 25px;">
       
       <!-- Câmera abaixo da logo -->
       <video id="camera" autoplay playsinline 
@@ -328,23 +328,26 @@ else if (pagina === "confirmacao") {
     </div>
   `;
 
-  // Ativar a câmera após carregar o conteúdo
+  // Ativar a câmera traseira após carregar o conteúdo
   setTimeout(() => {
     const video = document.getElementById('camera');
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.getUserMedia({ video: true })
+      navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: { exact: "environment" } } 
+      })
         .then(stream => {
           video.srcObject = stream;
         })
         .catch(err => {
-          console.error("Erro ao acessar a câmera:", err);
-          alert("Não foi possível acessar a câmera.");
+          console.error("Erro ao acessar a câmera traseira:", err);
+          alert("Não foi possível acessar a câmera traseira.");
         });
     } else {
       alert("Seu dispositivo não suporta acesso à câmera.");
     }
   }, 100);
 }
+
 
 
 
