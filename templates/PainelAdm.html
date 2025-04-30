@@ -309,64 +309,37 @@
 
 else if (pagina === "confirmacao") {
   conteudo.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
-      
-      <!-- Logo no topo -->
-      <img src="/static/logo.png" alt="Logo" 
-           style="width: 300px; max-width: 40vw; margin-bottom: 25px;">
-      
-      <!-- Câmera -->
-      <video id="camera" autoplay playsinline 
-             style="width: 90%; max-width: 400px; border: 2px solid #ffd700; border-radius: 10px; margin-bottom: 20px;"></video>
-      
-      <!-- Campo preenchido automaticamente -->
-      <input type="text" id="guardiao" placeholder="Código do QRCode ou digite manualmente"
-             style="padding: 12px; width: 90%; max-width: 400px; margin-bottom: 20px; border: 1px solid #ffd700; background-color: #111; color: #ffd700; border-radius: 5px; font-size: 16px;">
-      
-      <!-- Botão -->
-      <button onclick="verificarGuardiao()" 
-              style="background-color: #ffd700; color: #000; padding: 12px 24px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
-        Verificar
-      </button>
-    </div>
+    <h1>Confirmação via QR Code</h1>
+    <div id="reader" style="width: 300px;"></div>
+    <input type="text" id="resultado" placeholder="Resultado do QR Code" style="margin-top: 20px; padding: 10px; width: 300px;">
   `;
 
-  // Acessar câmera traseira e iniciar leitura do QR code
-  setTimeout(() => {
-    const video = document.getElementById('camera');
-    const input = document.getElementById('guardiao');
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
+  const html5QrCode = new Html5Qrcode("reader");
 
-    navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: { exact: "environment" } }
-    })
-    .then(stream => {
-      video.srcObject = stream;
-      video.setAttribute("playsinline", true);
+  Html5Qrcode.getCameras().then(devices => {
+    if (devices && devices.length) {
+      const cameraId = devices[0].id;
 
-      function scan() {
-        if (video.readyState === video.HAVE_ENOUGH_DATA) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
-          if (code) {
-            input.value = code.data;
-            return; // para de escanear após sucesso
-          }
+      html5QrCode.start(
+        cameraId,
+        {
+          fps: 10,  // 10 frames por segundo para a leitura
+          qrbox: 250  // Tamanho da caixa de leitura
+        },
+        qrCodeMessage => {
+          // Preenche o campo automaticamente com o código QR detectado
+          document.getElementById("resultado").value = qrCodeMessage;
+
+          // Você pode adicionar aqui outras ações, como enviar o código QR para um servidor ou processamento adicional
+        },
+        errorMessage => {
+          // Silencia erros para evitar flood no console
         }
-        requestAnimationFrame(scan);
-      }
-
-      requestAnimationFrame(scan);
-    })
-    .catch(err => {
-      console.error("Erro ao acessar a câmera:", err);
-      alert("Não foi possível acessar a câmera traseira.");
-    });
-  }, 100);
+      );
+    }
+  }).catch(err => {
+    console.error("Erro ao acessar câmera: ", err);
+  });
 }
 
 
