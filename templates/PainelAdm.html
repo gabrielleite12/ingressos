@@ -312,30 +312,57 @@ else if (pagina === "confirmacao") {
     <h1>Confirmação via QR Code</h1>
     <div id="reader" style="width: 300px;"></div>
     <input type="text" id="resultado" placeholder="Resultado do QR Code" style="margin-top: 20px; padding: 10px; width: 300px;">
+    <button id="trocarCamera" style="margin-top: 20px;">Trocar Câmera</button>
   `;
 
   const html5QrCode = new Html5Qrcode("reader");
 
+  let currentCameraId = null;
+
   Html5Qrcode.getCameras().then(devices => {
     if (devices && devices.length) {
-      const cameraId = devices[0].id;
+      // Define a câmera traseira como padrão
+      currentCameraId = devices.find(device => device.label.toLowerCase().includes("back"))?.id || devices[0].id;
 
+      // Inicia a leitura com a câmera selecionada
       html5QrCode.start(
-        cameraId,
+        currentCameraId,
         {
-          fps: 10,  // 10 frames por segundo para a leitura
-          qrbox: 250  // Tamanho da caixa de leitura
+          fps: 10,
+          qrbox: 250
         },
         qrCodeMessage => {
-          // Preenche o campo automaticamente com o código QR detectado
           document.getElementById("resultado").value = qrCodeMessage;
-
-          // Você pode adicionar aqui outras ações, como enviar o código QR para um servidor ou processamento adicional
         },
         errorMessage => {
-          // Silencia erros para evitar flood no console
+          // Silencia erros
         }
       );
+
+      // Função para trocar a câmera
+      document.getElementById("trocarCamera").addEventListener("click", () => {
+        // Alterna entre as câmeras
+        const nextCamera = devices.find(device => device.id !== currentCameraId);
+        if (nextCamera) {
+          currentCameraId = nextCamera.id;
+          html5QrCode.stop().then(() => {
+            // Reinicia com a nova câmera
+            html5QrCode.start(
+              currentCameraId,
+              {
+                fps: 10,
+                qrbox: 250
+              },
+              qrCodeMessage => {
+                document.getElementById("resultado").value = qrCodeMessage;
+              },
+              errorMessage => {
+                // Silencia erros
+              }
+            );
+          });
+        }
+      });
     }
   }).catch(err => {
     console.error("Erro ao acessar câmera: ", err);
