@@ -133,6 +133,7 @@
     <div class="nav-item" onclick="mudarConteudo('ingressos')"><i>🎟️</i><span class="label">Ingressos</span></div>
     <div class="nav-item" onclick="mudarConteudo('clientes')"><i>👥</i><span class="label">Clientes</span></div>
     <div class="nav-item" onclick="mudarConteudo('promoter')"><i>🧑‍💼</i><span class="label">Promoter</span></div>
+    <div class="nav-item" onclick="mudarConteudo('confirmacao')"><i>📷</i><span class="label">Confirmação</span></div>
     <div class="nav-item" onclick="mudarConteudo('configuracoes')"><i>⚙️</i><span class="label">Configurações</span></div>
   </div>
 
@@ -302,6 +303,50 @@
         console.error(err);
       });
 }
+
+else if (pagina === "confirmacao") {
+  conteudo.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
+      
+      <!-- Logo centralizada no topo -->
+      <img src="/static/logo.png" alt="Logo" 
+           style="width: 300px; max-width: 40vw; margin-bottom: 25px;">
+      
+      <!-- Câmera abaixo da logo -->
+      <video id="camera" autoplay playsinline 
+             style="width: 90%; max-width: 400px; border: 2px solid #ffd700; border-radius: 10px; margin-bottom: 20px;"></video>
+      
+      <!-- Campo de entrada abaixo da câmera -->
+      <input type="text" id="guardiao" placeholder="Digite ou escaneie o código"
+             style="padding: 12px; width: 80%; max-width: 300px; margin-bottom: 20px; border: 1px solid #ffd700; background-color: #111; color: #ffd700; border-radius: 5px; font-size: 16px;">
+      
+      <!-- Botão abaixo do campo de entrada -->
+      <button onclick="verificarGuardiao()" 
+              style="background-color: #ffd700; color: #000; padding: 12px 24px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+        Verificar
+      </button>
+    </div>
+  `;
+
+  // Ativar a câmera após carregar o conteúdo
+  setTimeout(() => {
+    const video = document.getElementById('camera');
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          video.srcObject = stream;
+        })
+        .catch(err => {
+          console.error("Erro ao acessar a câmera:", err);
+          alert("Não foi possível acessar a câmera.");
+        });
+    } else {
+      alert("Seu dispositivo não suporta acesso à câmera.");
+    }
+  }, 100);
+}
+
+
 
 
       else if (pagina === "configuracoes") {
