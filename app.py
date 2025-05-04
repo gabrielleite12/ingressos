@@ -487,6 +487,11 @@ def atualizarstatuspromoter():
 
 
 
+from flask import Flask, request, jsonify
+import sqlite3
+
+app = Flask(__name__)
+
 @app.route('/validar_codigo', methods=['POST'])
 def validar_codigo():
     data = request.get_json()
@@ -494,14 +499,31 @@ def validar_codigo():
 
     conn = sqlite3.connect('ingressos.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT 1 FROM ingressos WHERE codigo = ?", (codigo,))
+
+    # Verifica se o código existe e obtém o valor atual da entrada
+    cursor.execute("SELECT entrada FROM ingressos WHERE codigo = ?", (codigo,))
     resultado = cursor.fetchone()
-    conn.close()
 
     if resultado:
-        return jsonify(confirmado=True)
+        entrada_atual = resultado[0]
+
+        # Só subtrai se for maior que 0
+        if entrada_atual > 0:
+            nova_entrada = entrada_atual - 1
+            cursor.execute("UPDATE ingressos SET entrada = ? WHERE codigo = ?", (nova_entrada, codigo))
+            conn.commit()
+            conn.close()
+            return jsonify(confirmado=True, restante=nova_entrada)
+        else:
+            conn.close()
+            return jsonify(confirmado=False, motivo="Ingresso já utilizado")
     else:
-        return jsonify(confirmado=False)
+        conn.close()
+        return jsonify(confirmado=False, motivo="Código não encontrado")
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
