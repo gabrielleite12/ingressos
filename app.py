@@ -486,10 +486,6 @@ def atualizarstatuspromoter():
         return jsonify({"sucesso": False})
 
 
-
-
-app = Flask(__name__)
-
 @app.route('/validar_codigo', methods=['POST'])
 def validar_codigo():
     data = request.get_json()
