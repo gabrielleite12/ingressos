@@ -94,6 +94,7 @@ def comprar():
     cpf = data.get('cpf')
     email = data.get('email')
     universitario = data.get('universitario', False)
+    promoter = data.get('promoter', False)
 
     valor = 5 if universitario else 10
     pagamento = gerar_pix(valor, nome)
@@ -107,9 +108,9 @@ def comprar():
     conn = sqlite3.connect('ingressos.db')
     cursor = conn.cursor()
     cursor.execute(''' 
-        INSERT INTO ingressos (codigo, nome, cpf, email, universitario)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (txid, nome, cpf, email, universitario))
+    INSERT INTO ingressos (codigo, nome, cpf, email, universitario, promoter, entrada)
+    VALUES (?, ?, ?, ?, ?, ?,?)
+''', (txid, nome, cpf, email, universitario, promoter, 1))
     conn.commit()
     conn.close()
 
