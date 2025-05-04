@@ -485,5 +485,23 @@ def atualizarstatuspromoter():
         print("Erro ao atualizar status:", e)
         return jsonify({"sucesso": False})
 
+
+
+@app.route('/validar_codigo', methods=['POST'])
+def validar_codigo():
+    data = request.get_json()
+    codigo = data.get('codigo')
+
+    conn = sqlite3.connect('ingressos.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1 FROM ingressos WHERE codigo = ?", (codigo,))
+    resultado = cursor.fetchone()
+    conn.close()
+
+    if resultado:
+        return jsonify(confirmado=True)
+    else:
+        return jsonify(confirmado=False)
+
 if __name__ == '__main__':
     app.run(debug=True)
