@@ -312,54 +312,60 @@ else if (pagina === "confirmacao") {
     <h1>Confirmação via QR Code</h1>
     <div id="reader" style="width: 300px;"></div>
     <input type="text" id="resultado" placeholder="Resultado do QR Code" style="margin-top: 20px; padding: 10px; width: 300px;">
+    <div id="mensagem" style="margin-top: 10px;"></div>
     <button id="trocarCamera" style="margin-top: 20px;">Trocar Câmera</button>
   `;
 
   const html5QrCode = new Html5Qrcode("reader");
-
   let currentCameraId = null;
 
   Html5Qrcode.getCameras().then(devices => {
     if (devices && devices.length) {
-      // Define a câmera traseira como padrão
       currentCameraId = devices.find(device => device.label.toLowerCase().includes("back"))?.id || devices[0].id;
 
-      // Inicia a leitura com a câmera selecionada
-      html5QrCode.start(
-        currentCameraId,
-        {
-          fps: 10,
-          qrbox: 250
-        },
-        qrCodeMessage => {
-          document.getElementById("resultado").value = qrCodeMessage;
-        },
-        errorMessage => {
-          // Silencia erros
-        }
-      );
+      function iniciarLeitura(cameraId) {
+        html5QrCode.start(
+          cameraId,
+          {
+            fps: 10,
+            qrbox: 250
+          },
+          qrCodeMessage => {
+            const resultadoInput = document.getElementById("resultado");
+            const mensagemDiv = document.getElementById("mensagem");
+            resultadoInput.value = qrCodeMessage;
+            mensagemDiv.innerHTML = ""; // Limpa mensagens anteriores
 
-      // Função para trocar a câmera
+            fetch('/validar_codigo', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ codigo: qrCodeMessage })
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.confirmado) {
+                mensagemDiv.innerHTML = '<p style="color: green;">✅ Ingresso confirmado</p>';
+              } else {
+                mensagemDiv.innerHTML = '<p style="color: red;">❌ Código não encontrado</p>';
+              }
+            });
+          },
+          errorMessage => {
+            // Silencia erros
+          }
+        );
+      }
+
+      iniciarLeitura(currentCameraId);
+
       document.getElementById("trocarCamera").addEventListener("click", () => {
-        // Alterna entre as câmeras
         const nextCamera = devices.find(device => device.id !== currentCameraId);
         if (nextCamera) {
           currentCameraId = nextCamera.id;
           html5QrCode.stop().then(() => {
-            // Reinicia com a nova câmera
-            html5QrCode.start(
-              currentCameraId,
-              {
-                fps: 10,
-                qrbox: 250
-              },
-              qrCodeMessage => {
-                document.getElementById("resultado").value = qrCodeMessage;
-              },
-              errorMessage => {
-                // Silencia erros
-              }
-            );
+            iniciarLeitura(currentCameraId);
           });
         }
       });
@@ -368,6 +374,7 @@ else if (pagina === "confirmacao") {
     console.error("Erro ao acessar câmera: ", err);
   });
 }
+
 
 
 
