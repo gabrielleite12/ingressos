@@ -348,7 +348,11 @@ else if (pagina === "confirmacao") {
               if (data.confirmado) {
                 mensagemDiv.innerHTML = '<p style="color: green;">✅ Ingresso confirmado</p>';
               } else {
-                mensagemDiv.innerHTML = '<p style="color: red;">❌ Código não encontrado</p>';
+                if (data.motivo === "Ingresso já utilizado") {
+                  mensagemDiv.innerHTML = '<p style="color: orange;">⚠️ Essa pessoa já entrou</p>';
+                } else {
+                  mensagemDiv.innerHTML = '<p style="color: red;">❌ Código não encontrado</p>';
+                }
               }
             });
           },
