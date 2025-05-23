@@ -10,6 +10,8 @@ from werkzeug.utils import secure_filename
 import os
 import smtplib
 import ssl
+
+
 QR_CODE_DIR = 'static/qr_codes/'
 
 app = Flask(__name__)
